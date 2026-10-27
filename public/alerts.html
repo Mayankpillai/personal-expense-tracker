@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Low Balance Alert - Personal Expense Tracker</title>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="/" class="brand">
+        <span class="brand-icon">💰</span>
+        <div>
+          <h1 class="brand-title">ExpenseTracker</h1>
+          <p class="brand-subtitle">Personal Finance & Analytics</p>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="nav-link" id="navDashboard">📊 Dashboard</a>
+        <a href="/add-transaction.html" class="nav-link" id="navAdd">➕ Add Transaction</a>
+        <a href="/transactions.html" class="nav-link" id="navHistory">📜 History</a>
+        <a href="/alerts.html" class="nav-link active" id="navAlerts">
+          ⚠️ Balance Alert <span class="nav-badge" id="navAlertBadge" style="display: none;">Low!</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <div class="page-title-block">
+      <div>
+        <h2>⚠️ Low Balance Alert & Spending Advisor</h2>
+        <p>Monitor your safety threshold and view recommendations to prevent overspending.</p>
+      </div>
+      <div>
+        <a href="/add-transaction.html" class="btn btn-primary">➕ Record Transaction</a>
+      </div>
+    </div>
+
+    <!-- Threshold Setting Box -->
+    <div class="threshold-config-box">
+      <div>
+        <strong>⚙️ Minimum Safety Threshold:</strong>
+        <p class="text-muted text-sm">You will receive low balance warnings when your balance falls below this limit.</p>
+      </div>
+      <div class="threshold-input-group">
+        <div class="input-with-prefix" style="max-width: 180px;">
+          <span class="input-prefix">₹</span>
+          <input type="number" id="thresholdInput" class="form-control" min="0" step="100" placeholder="2000">
+        </div>
+        <button id="saveThresholdBtn" class="btn btn-secondary">Update Threshold</button>
+      </div>
+    </div>
+
+    <!-- Dynamic Alert Status Box (Safe vs Danger) -->
+    <div id="alertStatusBox" class="alert-status-card status-safe">
+      <h3 id="alertTitle">Checking Balance Status...</h3>
+      <p id="alertMessage" style="font-size: 15px; line-height: 1.6;">Loading financial status from server...</p>
+
+      <!-- Stat Values Strip -->
+      <div class="alert-stats-strip">
+        <div>
+          <div class="stat-item-label">Current Net Balance</div>
+          <div class="stat-item-value" id="currentBalanceDisplay">₹0.00</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Safety Threshold</div>
+          <div class="stat-item-value" id="thresholdDisplay">₹2,000.00</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Status Difference</div>
+          <div class="stat-item-value" id="statusDifferenceDisplay">₹0.00</div>
+        </div>
+      </div>
+
+      <!-- Actionable Financial Advice -->
+      <div class="advice-section">
+        <h4>💡 Recommended Financial Actions:</h4>
+        <ul class="advice-list" id="alertAdviceList">
+          <!-- Dynamically populated based on balance status -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Spending Breakdown & Insights Section -->
+    <div class="insights-grid">
+      <!-- Top Spending Categories -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📊 Where Has Most Money Gone?</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-muted text-sm" style="margin-bottom: 14px;">Highest expense categories eating into your balance:</p>
+          <ul class="insights-list" id="topCategoriesList">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Largest Recent Expenses -->
+      <div class="card">
+        <div class="card-header">
+          <h3>💸 Largest Recent Expenses</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-muted text-sm" style="margin-bottom: 14px;">Single largest transactions that reduced your funds:</p>
+          <ul class="insights-list" id="largestExpensesList">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Helpful College Budgeting Tips -->
+    <div class="card">
+      <div class="card-header">
+        <h3>🎓 Smart Student Spending Guidelines</h3>
+      </div>
+      <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <strong style="color: var(--primary);">1. The 50 / 30 / 20 Rule</strong>
+            <p class="text-muted text-sm" style="margin-top: 6px;">
+              Allocate 50% of your allowance to Needs (Food, Rent, Travel), 30% to Wants (Entertainment, Shopping), and 20% to emergency savings.
+            </p>
+          </div>
+          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <strong style="color: var(--primary);">2. Daily Spending Cap</strong>
+            <p class="text-muted text-sm" style="margin-top: 6px;">
+              Divide your remaining balance by the remaining days in the month to find your daily maximum spending limit.
+            </p>
+          </div>
+          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <strong style="color: var(--primary);">3. 24-Hour Purchase Rule</strong>
+            <p class="text-muted text-sm" style="margin-top: 6px;">
+              For any non-essential purchase over ₹500, wait 24 hours before buying to avoid impulse spending.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>Personal Expense Tracker &bull; College Project Demonstration</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/alerts.js"></script>
+</body>
+</html>

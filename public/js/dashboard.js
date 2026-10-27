@@ -1,40 +1,6 @@
-// Dashboard coordinator: loading stats, handling filters, and coordinating components
+// Dashboard page coordinator: summary cards, charts, recent transactions, and low balance banner
 
-// Display toast message
-function showToast(message, type = 'success') {
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <span class="toast-icon">${type === 'success' ? '✅' : '⚠️'}</span>
-    <span class="toast-message">${message}</span>
-  `;
-
-  container.appendChild(toast);
-
-  // Auto remove after 3.5 seconds
-  setTimeout(() => {
-    toast.classList.add('toast-fade-out');
-    setTimeout(() => {
-      toast.remove();
-    }, 400);
-  }, 3500);
-}
-
-// Read current active filters
-function getActiveFilters() {
-  const type = document.getElementById('filterType')?.value || 'all';
-  const category = document.getElementById('filterCategory')?.value || 'all';
-  const startDate = document.getElementById('filterStartDate')?.value || '';
-  const endDate = document.getElementById('filterEndDate')?.value || '';
-  const search = document.getElementById('filterSearch')?.value || '';
-
-  return { type, category, startDate, endDate, search };
-}
-
-// Update dashboard summary cards
+// Update summary cards on dashboard
 function updateSummaryCards(summary) {
   const incomeEl = document.getElementById('totalIncome');
   const expenseEl = document.getElementById('totalExpense');
@@ -47,7 +13,6 @@ function updateSummaryCards(summary) {
   if (balanceEl) {
     const balance = summary.balance || 0;
     balanceEl.textContent = formatCurrency(balance);
-    // Green if positive, Red if negative
     if (balance >= 0) {
       balanceEl.classList.remove('balance-negative');
       balanceEl.classList.add('balance-positive');
@@ -62,82 +27,90 @@ function updateSummaryCards(summary) {
   }
 }
 
-// Reload all data (summary, transactions, charts)
-async function refreshAll() {
-  const filters = getActiveFilters();
+// Display Low Balance Warning Banner if balance is below threshold
+function checkDashboardLowBalance(balance) {
+  const threshold = getLowBalanceThreshold();
+  const banner = document.getElementById('lowBalanceBanner');
+  const bannerAmount = document.getElementById('bannerBalanceAmount');
+  const bannerThreshold = document.getElementById('bannerThresholdAmount');
 
+  if (!banner) return;
+
+  if (balance < threshold) {
+    banner.style.display = 'flex';
+    if (bannerAmount) bannerAmount.textContent = formatCurrency(balance);
+    if (bannerThreshold) bannerThreshold.textContent = formatCurrency(threshold);
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// Render recent 5 transactions
+function renderRecentTransactions(transactions) {
+  const tbody = document.getElementById('recentTableBody');
+  const emptyState = document.getElementById('recentEmpty');
+  const table = document.getElementById('recentTable');
+
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const recent = transactions.slice(0, 5);
+
+  if (recent.length === 0) {
+    if (table) table.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'block';
+    return;
+  }
+
+  if (table) table.style.display = 'table';
+  if (emptyState) emptyState.style.display = 'none';
+
+  recent.forEach(t => {
+    const tr = document.createElement('tr');
+    const isIncome = t.type === 'income';
+
+    tr.innerHTML = `
+      <td>${formatDate(t.date)}</td>
+      <td>
+        <span class="badge ${isIncome ? 'badge-income' : 'badge-expense'}">
+          ${t.type.toUpperCase()}
+        </span>
+      </td>
+      <td><span class="category-pill">${t.category}</span></td>
+      <td class="cell-note">${t.note || '<span class="text-muted">—</span>'}</td>
+      <td class="cell-amount ${isIncome ? 'text-income' : 'text-expense'}">
+        ${isIncome ? '+' : '-'} ${formatCurrency(t.amount)}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Load all dashboard components
+async function loadDashboard() {
   try {
-    // 1. Fetch filtered transactions
-    const transactions = await api.getTransactions(filters);
-    renderTransactionsTable(transactions);
-
-    // 2. Fetch summary totals (respecting date filter)
-    const summary = await api.getSummary({
-      startDate: filters.startDate,
-      endDate: filters.endDate
-    });
+    // 1. Fetch Summary Totals
+    const summary = await api.getSummary();
     updateSummaryCards(summary);
+    checkDashboardLowBalance(summary.balance || 0);
 
-    // 3. Fetch category breakdown for doughnut chart
-    const categories = await api.getCategoryBreakdown({
-      startDate: filters.startDate,
-      endDate: filters.endDate
-    });
+    // 2. Fetch Category Breakdown for Doughnut Chart
+    const categories = await api.getCategoryBreakdown();
     charts.renderCategoryChart(categories);
 
-    // 4. Fetch monthly income vs expense comparison for bar chart
+    // 3. Fetch Monthly Comparison for Bar Chart
     const monthly = await api.getMonthlyComparison();
     charts.renderMonthlyChart(monthly);
+
+    // 4. Fetch Recent Transactions
+    const transactions = await api.getTransactions();
+    renderRecentTransactions(transactions);
   } catch (error) {
-    console.error('Error refreshing dashboard:', error);
-    showToast(error.message || 'Error loading data from server', 'error');
+    console.error('Error loading dashboard:', error);
+    showToast(error.message || 'Error fetching data from server', 'error');
   }
 }
 
-// Initialize filter events
-function initFilters() {
-  const filterType = document.getElementById('filterType');
-  const filterCategory = document.getElementById('filterCategory');
-  const filterStartDate = document.getElementById('filterStartDate');
-  const filterEndDate = document.getElementById('filterEndDate');
-  const filterSearch = document.getElementById('filterSearch');
-  const resetBtn = document.getElementById('resetFiltersBtn');
-
-  // Trigger refresh on change
-  [filterType, filterCategory, filterStartDate, filterEndDate].forEach(el => {
-    if (el) el.addEventListener('change', refreshAll);
-  });
-
-  // Debounced search input
-  let searchTimeout = null;
-  if (filterSearch) {
-    filterSearch.addEventListener('input', () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(refreshAll, 300);
-    });
-  }
-
-  // Reset filters button
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (filterType) filterType.value = 'all';
-      if (filterCategory) filterCategory.value = 'all';
-      if (filterStartDate) filterStartDate.value = '';
-      if (filterEndDate) filterEndDate.value = '';
-      if (filterSearch) filterSearch.value = '';
-      refreshAll();
-    });
-  }
-}
-
-// Application startup
 document.addEventListener('DOMContentLoaded', () => {
-  populateFilterCategories();
-  initAddTransactionForm();
-  initEditModal();
-  initDeleteModal();
-  initFilters();
-
-  // Initial data load
-  refreshAll();
+  loadDashboard();
 });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Expense Tracker with Analytics</title>
+  <title>Dashboard - Personal Expense Tracker</title>
   <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,25 +14,42 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <!-- Header / Navigation Bar -->
+  <!-- Header / Navigation -->
   <header class="app-header">
     <div class="header-container">
-      <div class="brand">
+      <a href="/" class="brand">
         <span class="brand-icon">💰</span>
         <div>
           <h1 class="brand-title">ExpenseTracker</h1>
-          <p class="brand-subtitle">Personal Finance & Spending Analytics</p>
+          <p class="brand-subtitle">Personal Finance & Analytics</p>
         </div>
-      </div>
-      <div class="header-actions">
-        <span class="currency-tag">Currency: <strong>INR (₹)</strong></span>
-      </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="nav-link active" id="navDashboard">📊 Dashboard</a>
+        <a href="/add-transaction.html" class="nav-link" id="navAdd">➕ Add Transaction</a>
+        <a href="/transactions.html" class="nav-link" id="navHistory">📜 History</a>
+        <a href="/alerts.html" class="nav-link" id="navAlerts">
+          ⚠️ Balance Alert <span class="nav-badge" id="navAlertBadge" style="display: none;">Low!</span>
+        </a>
+      </nav>
     </div>
   </header>
 
   <!-- Main Container -->
   <main class="main-container">
-    <!-- Top Summary Cards -->
+    <!-- Low Balance Warning Banner (visible when balance < threshold) -->
+    <div class="alert-banner" id="lowBalanceBanner" style="display: none;">
+      <div class="alert-banner-content">
+        <span class="alert-banner-icon">🚨</span>
+        <div class="alert-banner-text">
+          <h4>Low Balance Warning!</h4>
+          <p>Your current net balance is <strong id="bannerBalanceAmount">₹0.00</strong>, which has dropped below your safety limit of <strong id="bannerThresholdAmount">₹2,000.00</strong>. Please use your money carefully and avoid non-essential spending.</p>
+        </div>
+      </div>
+      <a href="/alerts.html" class="btn btn-danger btn-sm">View Alert & Tips →</a>
+    </div>
+
+    <!-- Summary Cards -->
     <section class="summary-grid">
       <div class="summary-card card-income">
         <div class="summary-icon">📈</div>
@@ -67,143 +84,54 @@
       </div>
     </section>
 
-    <!-- Two Column Layout: Add Form & Charts -->
-    <section class="dashboard-split">
-      <!-- Add Transaction Form Card -->
-      <div class="card form-card">
+    <!-- Visual Analytics Section -->
+    <section class="charts-grid">
+      <!-- Category Doughnut Chart -->
+      <div class="card chart-card">
         <div class="card-header">
-          <h3>➕ Add New Transaction</h3>
+          <h3>🍩 Expenses by Category</h3>
         </div>
-        <div class="card-body">
-          <form id="addTransactionForm">
-            <!-- Type Selector -->
-            <div class="form-group">
-              <label class="form-label">Transaction Type</label>
-              <div class="type-toggle-group">
-                <label class="type-radio-label">
-                  <input type="radio" name="type" value="expense" checked>
-                  <span class="radio-custom expense-tab">Expense</span>
-                </label>
-                <label class="type-radio-label">
-                  <input type="radio" name="type" value="income">
-                  <span class="radio-custom income-tab">Income</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Amount Input -->
-            <div class="form-group">
-              <label for="addAmount" class="form-label">Amount (₹) *</label>
-              <div class="input-with-prefix">
-                <span class="input-prefix">₹</span>
-                <input type="number" id="addAmount" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
-              </div>
-            </div>
-
-            <!-- Category Dropdown -->
-            <div class="form-group">
-              <label for="addCategory" class="form-label">Category *</label>
-              <select id="addCategory" class="form-control" required>
-                <!-- Populated dynamically -->
-              </select>
-            </div>
-
-            <!-- Date Picker -->
-            <div class="form-group">
-              <label for="addDate" class="form-label">Date *</label>
-              <input type="date" id="addDate" class="form-control" required>
-            </div>
-
-            <!-- Note / Description -->
-            <div class="form-group">
-              <label for="addNote" class="form-label">Description / Note</label>
-              <input type="text" id="addNote" class="form-control" placeholder="e.g. Grocery shopping, Freelance stipend">
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Add Transaction</button>
-          </form>
+        <div class="card-body chart-body">
+          <div id="categoryChartEmpty" class="chart-empty-state">
+            <p>No expense data recorded yet.</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+          </div>
         </div>
       </div>
 
-      <!-- Analytics Charts Card -->
-      <div class="analytics-wrapper">
-        <!-- Category Doughnut Chart -->
-        <div class="card chart-card">
-          <div class="card-header">
-            <h3>🍩 Expenses by Category</h3>
-          </div>
-          <div class="card-body chart-body">
-            <div id="categoryChartEmpty" class="chart-empty-state">
-              <p>No expense data available for the selected period.</p>
-            </div>
-            <div class="chart-container">
-              <canvas id="categoryChart"></canvas>
-            </div>
-          </div>
+      <!-- Monthly Comparison Bar Chart -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3>📊 Monthly Income vs Expenses</h3>
         </div>
-
-        <!-- Monthly Comparison Bar Chart -->
-        <div class="card chart-card">
-          <div class="card-header">
-            <h3>📊 Monthly Income vs Expenses</h3>
+        <div class="card-body chart-body">
+          <div id="monthlyChartEmpty" class="chart-empty-state">
+            <p>No monthly comparison data recorded yet.</p>
           </div>
-          <div class="card-body chart-body">
-            <div id="monthlyChartEmpty" class="chart-empty-state">
-              <p>No monthly comparison data recorded yet.</p>
-            </div>
-            <div class="chart-container">
-              <canvas id="monthlyChart"></canvas>
-            </div>
+          <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Transaction History Section with Filters -->
-    <section class="card history-section">
-      <div class="card-header history-header">
+    <!-- Recent Transactions Table Preview -->
+    <section class="card">
+      <div class="card-header">
         <div>
-          <h3>📜 Transaction History</h3>
-          <p class="section-desc">View, filter, edit and manage all your past records</p>
+          <h3>🕒 Recent Transactions</h3>
+          <p class="text-muted text-sm">Showing the latest 5 records</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="/add-transaction.html" class="btn btn-primary btn-sm">➕ Add New</a>
+          <a href="/transactions.html" class="btn btn-secondary btn-sm">View Full History →</a>
         </div>
       </div>
 
-      <!-- Filter Bar -->
-      <div class="filters-bar">
-        <div class="filter-item search-filter">
-          <input type="text" id="filterSearch" class="form-control" placeholder="🔍 Search note or category...">
-        </div>
-
-        <div class="filter-item">
-          <select id="filterType" class="form-control">
-            <option value="all">All Types</option>
-            <option value="expense">Expense Only</option>
-            <option value="income">Income Only</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <select id="filterCategory" class="form-control">
-            <option value="all">All Categories</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <input type="date" id="filterStartDate" class="form-control" title="Start Date">
-        </div>
-
-        <div class="filter-item">
-          <input type="date" id="filterEndDate" class="form-control" title="End Date">
-        </div>
-
-        <div class="filter-item">
-          <button id="resetFiltersBtn" class="btn btn-secondary" title="Reset Filters">Reset</button>
-        </div>
-      </div>
-
-      <!-- Transactions Table -->
       <div class="table-responsive">
-        <table class="table" id="transactionsTable">
+        <table class="table" id="recentTable">
           <thead>
             <tr>
               <th>Date</th>
@@ -211,109 +139,34 @@
               <th>Category</th>
               <th>Description</th>
               <th>Amount</th>
-              <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="transactionsTableBody">
-            <!-- Dynamically populated rows -->
+          <tbody id="recentTableBody">
+            <!-- Dynamically populated -->
           </tbody>
         </table>
 
-        <!-- Empty State -->
-        <div id="transactionsEmpty" class="empty-state" style="display: none;">
+        <div id="recentEmpty" class="empty-state" style="display: none;">
           <div class="empty-icon">📂</div>
-          <h4>No Transactions Found</h4>
-          <p>No records match your active filters or no transactions have been added yet.</p>
+          <h4>No Transactions Yet</h4>
+          <p>Start recording your daily expenses and income!</p>
+          <a href="/add-transaction.html" class="btn btn-primary" style="margin-top: 12px;">Add First Transaction</a>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Edit Transaction Modal -->
-  <div class="modal-backdrop" id="editModal">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>Edit Transaction</h3>
-        <button type="button" class="btn-close" id="closeEditModal">&times;</button>
-      </div>
-      <form id="editTransactionForm">
-        <input type="hidden" id="editId">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Transaction Type</label>
-            <div class="type-toggle-group">
-              <label class="type-radio-label">
-                <input type="radio" name="editType" value="expense">
-                <span class="radio-custom expense-tab">Expense</span>
-              </label>
-              <label class="type-radio-label">
-                <input type="radio" name="editType" value="income">
-                <span class="radio-custom income-tab">Income</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="editAmount" class="form-label">Amount (₹) *</label>
-            <div class="input-with-prefix">
-              <span class="input-prefix">₹</span>
-              <input type="number" id="editAmount" class="form-control" step="0.01" min="0.01" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="editCategory" class="form-label">Category *</label>
-            <select id="editCategory" class="form-control" required></select>
-          </div>
-
-          <div class="form-group">
-            <label for="editDate" class="form-label">Date *</label>
-            <input type="date" id="editDate" class="form-control" required>
-          </div>
-
-          <div class="form-group">
-            <label for="editNote" class="form-label">Description / Note</label>
-            <input type="text" id="editNote" class="form-control">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Delete Confirmation Modal -->
-  <div class="modal-backdrop" id="deleteModal">
-    <div class="modal-dialog modal-dialog-sm">
-      <div class="modal-header">
-        <h3>Confirm Deletion</h3>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete this transaction record? This action cannot be undone.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
-
   <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <p>Personal Expense Tracker with Analytics &bull; College Project Demonstration</p>
+      <p>Personal Expense Tracker &bull; College Project Demonstration</p>
     </div>
   </footer>
 
   <!-- Scripts -->
   <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
   <script src="js/charts.js"></script>
-  <script src="js/transactions.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
 </html>

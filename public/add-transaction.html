@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Transaction - Personal Expense Tracker</title>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="/" class="brand">
+        <span class="brand-icon">💰</span>
+        <div>
+          <h1 class="brand-title">ExpenseTracker</h1>
+          <p class="brand-subtitle">Personal Finance & Analytics</p>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="nav-link" id="navDashboard">📊 Dashboard</a>
+        <a href="/add-transaction.html" class="nav-link active" id="navAdd">➕ Add Transaction</a>
+        <a href="/transactions.html" class="nav-link" id="navHistory">📜 History</a>
+        <a href="/alerts.html" class="nav-link" id="navAlerts">
+          ⚠️ Balance Alert <span class="nav-badge" id="navAlertBadge" style="display: none;">Low!</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <div class="form-center-wrapper">
+      <div class="page-title-block" style="margin-bottom: 18px;">
+        <div>
+          <h2>➕ Record New Transaction</h2>
+          <p>Add an income or expense transaction to update your balance and charts.</p>
+        </div>
+      </div>
+
+      <!-- Add Transaction Form Card -->
+      <div class="card">
+        <div class="card-body">
+          <form id="addTransactionForm">
+            <!-- Type Selector -->
+            <div class="form-group">
+              <label class="form-label">Transaction Type</label>
+              <div class="type-toggle-group">
+                <label class="type-radio-label">
+                  <input type="radio" name="type" value="expense" checked>
+                  <span class="radio-custom expense-tab">Expense</span>
+                </label>
+                <label class="type-radio-label">
+                  <input type="radio" name="type" value="income">
+                  <span class="radio-custom income-tab">Income</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="form-group">
+              <label for="addAmount" class="form-label">Amount (₹) *</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">₹</span>
+                <input type="number" id="addAmount" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
+              </div>
+            </div>
+
+            <!-- Category Dropdown -->
+            <div class="form-group">
+              <label for="addCategory" class="form-label">Category *</label>
+              <select id="addCategory" class="form-control" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <!-- Date Picker -->
+            <div class="form-group">
+              <label for="addDate" class="form-label">Date *</label>
+              <input type="date" id="addDate" class="form-control" required>
+            </div>
+
+            <!-- Note / Description -->
+            <div class="form-group">
+              <label for="addNote" class="form-label">Description / Note</label>
+              <input type="text" id="addNote" class="form-control" placeholder="e.g. Canteen lunch, Project freelance stipend">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+              <button type="submit" class="btn btn-primary btn-block">Save Transaction</button>
+              <button type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Preview of Recent Additions -->
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+          <h3>🕒 Recently Added Records</h3>
+          <a href="/transactions.html" class="btn btn-secondary btn-sm">Full History →</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table" id="recentAddedTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Note</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="recentAddedTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+
+          <div id="recentAddedEmpty" class="empty-state" style="display: none;">
+            <p class="text-muted">No transactions added yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>Personal Expense Tracker &bull; College Project Demonstration</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/add-transaction.js"></script>
+</body>
+</html>
