@@ -1,7 +1,7 @@
 // Chart.js visualizations for Expense Analytics
 
 let categoryChartInstance = null;
-let monthlyChartInstance = null;
+let dailyChartInstance = null;
 
 // Palette for categories
 const CHART_COLORS = [
@@ -78,19 +78,22 @@ const charts = {
     });
   },
 
-  // Render Bar Chart for Monthly Income vs Expense Comparison
-  renderMonthlyChart(monthlyData) {
-    const ctx = document.getElementById('monthlyChart');
+  // Render Day-wise Expense Bar Chart for Selected Month
+  renderDailyExpenseChart(dailyData) {
+    const ctx = document.getElementById('dailyExpenseChart');
     if (!ctx) return;
 
-    if (monthlyChartInstance) {
-      monthlyChartInstance.destroy();
+    if (dailyChartInstance) {
+      dailyChartInstance.destroy();
     }
 
-    const emptyNotice = document.getElementById('monthlyChartEmpty');
+    const emptyNotice = document.getElementById('dailyChartEmpty');
 
-    if (!monthlyData || monthlyData.length === 0) {
-      if (emptyNotice) emptyNotice.style.display = 'flex';
+    if (!dailyData || !dailyData.days || dailyData.days.length === 0 || dailyData.totalExpense === 0) {
+      if (emptyNotice) {
+        emptyNotice.style.display = 'flex';
+        emptyNotice.innerHTML = `<p>No expenses recorded for ${dailyData ? dailyData.monthLabel : 'this month'}.</p>`;
+      }
       ctx.style.display = 'none';
       return;
     }
@@ -98,28 +101,22 @@ const charts = {
     if (emptyNotice) emptyNotice.style.display = 'none';
     ctx.style.display = 'block';
 
-    const labels = monthlyData.map(d => d.label);
-    const incomeValues = monthlyData.map(d => d.income);
-    const expenseValues = monthlyData.map(d => d.expense);
+    const labels = dailyData.days.map(d => `${d.day}`);
+    const values = dailyData.days.map(d => d.amount);
 
-    monthlyChartInstance = new Chart(ctx, {
+    dailyChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
-            label: 'Income (₹)',
-            data: incomeValues,
-            backgroundColor: '#10b981',
-            borderRadius: 6,
-            maxBarThickness: 36
-          },
-          {
             label: 'Expense (₹)',
-            data: expenseValues,
+            data: values,
             backgroundColor: '#ef4444',
-            borderRadius: 6,
-            maxBarThickness: 36
+            hoverBackgroundColor: '#dc2626',
+            borderRadius: 4,
+            borderSkipped: false,
+            maxBarThickness: 28
           }
         ]
       },
@@ -128,6 +125,12 @@ const charts = {
         maintainAspectRatio: false,
         scales: {
           x: {
+            title: {
+              display: true,
+              text: `Day of Month (${dailyData.monthLabel})`,
+              font: { size: 11, family: "'Inter', sans-serif", weight: '500' },
+              color: '#64748b'
+            },
             grid: { display: false }
           },
           y: {
@@ -141,18 +144,17 @@ const charts = {
         },
         plugins: {
           legend: {
-            position: 'top',
-            labels: {
-              boxWidth: 14,
-              font: { family: "'Inter', sans-serif", size: 12 }
-            }
+            display: false
           },
           tooltip: {
             callbacks: {
+              title: function(items) {
+                const day = items[0].label;
+                return `Day ${day} (${dailyData.monthLabel})`;
+              },
               label: function(context) {
-                const datasetLabel = context.dataset.label || '';
                 const value = context.parsed.y || 0;
-                return ` ${datasetLabel}: ₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                return ` Daily Expense: ₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
               }
             }
           }

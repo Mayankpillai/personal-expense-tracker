@@ -54,7 +54,7 @@
       <div class="summary-card card-income">
         <div class="summary-icon">📈</div>
         <div class="summary-details">
-          <span class="summary-label">Total Income</span>
+          <span class="summary-label">Total Money</span>
           <h2 class="summary-value" id="totalIncome">₹0.00</h2>
         </div>
       </div>
@@ -101,17 +101,23 @@
         </div>
       </div>
 
-      <!-- Monthly Comparison Bar Chart -->
+      <!-- Day-wise Expense Bar Chart (with Month Selector) -->
       <div class="card chart-card">
-        <div class="card-header">
-          <h3>📊 Monthly Income vs Expenses</h3>
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <h3>📊 Daily Expenses</h3>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label for="expenseMonthSelect" class="text-muted text-sm">Month:</label>
+            <select id="expenseMonthSelect" class="form-control" style="width: auto; padding: 4px 10px; font-size: 13px;">
+              <!-- Dynamically populated with current & previous months -->
+            </select>
+          </div>
         </div>
         <div class="card-body chart-body">
-          <div id="monthlyChartEmpty" class="chart-empty-state">
-            <p>No monthly comparison data recorded yet.</p>
+          <div id="dailyChartEmpty" class="chart-empty-state">
+            <p>No expense data recorded for this month.</p>
           </div>
           <div class="chart-container">
-            <canvas id="monthlyChart"></canvas>
+            <canvas id="dailyExpenseChart"></canvas>
           </div>
         </div>
       </div>

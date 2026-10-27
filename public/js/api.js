@@ -86,5 +86,14 @@ const api = {
   async getMonthlyComparison() {
     const res = await fetch(`${API_BASE}/analytics/monthly`);
     return this.handleResponse(res);
+  },
+
+  // Get day-wise expenses for a selected month (supports previous months)
+  async getDailyExpenses(month) {
+    const params = new URLSearchParams();
+    if (month) params.append('month', month);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE}/analytics/daily${queryString}`);
+    return this.handleResponse(res);
   }
 };

@@ -1,4 +1,4 @@
-// Dashboard page coordinator: summary cards, charts, recent transactions, and low balance banner
+// Dashboard page coordinator: summary cards, category chart, daily expenses bar chart, and low balance banner
 
 // Update summary cards on dashboard
 function updateSummaryCards(summary) {
@@ -86,10 +86,48 @@ function renderRecentTransactions(transactions) {
   });
 }
 
+// Load and render Day-wise Expense Bar Chart for selected month
+let monthSelectInitialized = false;
+
+async function loadDailyExpenseChart(selectedMonth) {
+  try {
+    const dailyData = await api.getDailyExpenses(selectedMonth);
+
+    // Populate month selector dropdown if not already populated
+    const select = document.getElementById('expenseMonthSelect');
+    if (select && (!monthSelectInitialized || !selectedMonth)) {
+      select.innerHTML = '';
+      if (dailyData.availableMonths && dailyData.availableMonths.length > 0) {
+        dailyData.availableMonths.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.period;
+          opt.textContent = m.label;
+          if (m.period === dailyData.selectedMonth) {
+            opt.selected = true;
+          }
+          select.appendChild(opt);
+        });
+      }
+
+      if (!monthSelectInitialized) {
+        select.addEventListener('change', (e) => {
+          loadDailyExpenseChart(e.target.value);
+        });
+        monthSelectInitialized = true;
+      }
+    }
+
+    // Render bar chart
+    charts.renderDailyExpenseChart(dailyData);
+  } catch (err) {
+    console.error('Error loading daily expenses chart:', err);
+  }
+}
+
 // Load all dashboard components
 async function loadDashboard() {
   try {
-    // 1. Fetch Summary Totals
+    // 1. Fetch Summary Totals (Total Money, Expenses, Balance)
     const summary = await api.getSummary();
     updateSummaryCards(summary);
     checkDashboardLowBalance(summary.balance || 0);
@@ -98,9 +136,8 @@ async function loadDashboard() {
     const categories = await api.getCategoryBreakdown();
     charts.renderCategoryChart(categories);
 
-    // 3. Fetch Monthly Comparison for Bar Chart
-    const monthly = await api.getMonthlyComparison();
-    charts.renderMonthlyChart(monthly);
+    // 3. Fetch Day-wise Expenses for Bar Chart (defaults to current month)
+    await loadDailyExpenseChart();
 
     // 4. Fetch Recent Transactions
     const transactions = await api.getTransactions();

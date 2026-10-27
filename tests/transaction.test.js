@@ -271,6 +271,31 @@ describe('Expense Tracker API & Functional Tests', () => {
     assert.equal(data[1].income, 22000);
   });
 
+  // T12d: Day-wise expenses for a selected month
+  test('T12d: Daily expenses returns day-wise spending for selected month', async () => {
+    await Transaction.create([
+      { type: 'expense', amount: 8000, category: 'Rent', date: new Date('2026-10-02') },
+      { type: 'expense', amount: 1500, category: 'Food', date: new Date('2026-10-02') },
+      { type: 'expense', amount: 500, category: 'Travel', date: new Date('2026-10-10') }
+    ]);
+
+    const res = await fetch(`${baseUrl}/analytics/daily?month=2026-10`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.selectedMonth, '2026-10');
+    assert.equal(data.totalExpense, 10000);
+    assert.ok(Array.isArray(data.days));
+    assert.equal(data.days.length, 31);
+
+    // Day 2 should have 8000 + 1500 = 9500
+    const day2 = data.days.find(d => d.day === 2);
+    assert.equal(day2.amount, 9500);
+
+    // Day 10 should have 500
+    const day10 = data.days.find(d => d.day === 10);
+    assert.equal(day10.amount, 500);
+  });
+
   // T13: Health check endpoint
   test('T13: Health endpoint returns status ok', async () => {
     const res = await fetch(`${baseUrl}/health`);
