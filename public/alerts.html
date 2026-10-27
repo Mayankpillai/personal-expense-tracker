@@ -37,8 +37,8 @@
   <main class="main-container">
     <div class="page-title-block">
       <div>
-        <h2>⚠️ Low Balance Alert & Spending Advisor</h2>
-        <p>Monitor your safety threshold and view recommendations to prevent overspending.</p>
+        <h2>⚠️ Low Balance Alert</h2>
+        <p>Monitor your account balance and check alerts if your balance is running low.</p>
       </div>
       <div>
         <a href="/add-transaction.html" class="btn btn-primary">➕ Record Transaction</a>
@@ -48,102 +48,32 @@
     <!-- Threshold Setting Box -->
     <div class="threshold-config-box">
       <div>
-        <strong>⚙️ Minimum Safety Threshold:</strong>
-        <p class="text-muted text-sm">You will receive low balance warnings when your balance falls below this limit.</p>
+        <strong>⚙️ Minimum Balance Limit:</strong>
+        <p class="text-muted text-sm">Alert triggers if your current balance falls below this limit.</p>
       </div>
       <div class="threshold-input-group">
         <div class="input-with-prefix" style="max-width: 180px;">
           <span class="input-prefix">₹</span>
           <input type="number" id="thresholdInput" class="form-control" min="0" step="100" placeholder="2000">
         </div>
-        <button id="saveThresholdBtn" class="btn btn-secondary">Update Threshold</button>
+        <button id="saveThresholdBtn" class="btn btn-secondary">Update Limit</button>
       </div>
     </div>
 
-    <!-- Dynamic Alert Status Box (Safe vs Danger) -->
-    <div id="alertStatusBox" class="alert-status-card status-safe">
-      <h3 id="alertTitle">Checking Balance Status...</h3>
-      <p id="alertMessage" style="font-size: 15px; line-height: 1.6;">Loading financial status from server...</p>
-
-      <!-- Stat Values Strip -->
-      <div class="alert-stats-strip">
-        <div>
-          <div class="stat-item-label">Current Net Balance</div>
-          <div class="stat-item-value" id="currentBalanceDisplay">₹0.00</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Safety Threshold</div>
-          <div class="stat-item-value" id="thresholdDisplay">₹2,000.00</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Status Difference</div>
-          <div class="stat-item-value" id="statusDifferenceDisplay">₹0.00</div>
-        </div>
-      </div>
-
-      <!-- Actionable Financial Advice -->
-      <div class="advice-section">
-        <h4>💡 Recommended Financial Actions:</h4>
-        <ul class="advice-list" id="alertAdviceList">
-          <!-- Dynamically populated based on balance status -->
-        </ul>
-      </div>
+    <!-- Dynamic Alert Box (Shows warning if balance is low) -->
+    <div id="alertBox">
+      <!-- Populated dynamically by alerts.js -->
     </div>
 
-    <!-- Spending Breakdown & Insights Section -->
-    <div class="insights-grid">
-      <!-- Top Spending Categories -->
-      <div class="card">
-        <div class="card-header">
-          <h3>📊 Where Has Most Money Gone?</h3>
-        </div>
-        <div class="card-body">
-          <p class="text-muted text-sm" style="margin-bottom: 14px;">Highest expense categories eating into your balance:</p>
-          <ul class="insights-list" id="topCategoriesList">
-            <!-- Dynamically populated -->
-          </ul>
-        </div>
-      </div>
-
-      <!-- Largest Recent Expenses -->
-      <div class="card">
-        <div class="card-header">
-          <h3>💸 Largest Recent Expenses</h3>
-        </div>
-        <div class="card-body">
-          <p class="text-muted text-sm" style="margin-bottom: 14px;">Single largest transactions that reduced your funds:</p>
-          <ul class="insights-list" id="largestExpensesList">
-            <!-- Dynamically populated -->
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Helpful College Budgeting Tips -->
-    <div class="card">
+    <!-- Largest Expense in This Month Card -->
+    <div class="card" style="margin-top: 12px;">
       <div class="card-header">
-        <h3>🎓 Smart Student Spending Guidelines</h3>
+        <h3>💸 Largest Expense in This Month</h3>
+        <span class="text-muted text-sm" id="currentMonthLabel"></span>
       </div>
       <div class="card-body">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
-          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <strong style="color: var(--primary);">1. The 50 / 30 / 20 Rule</strong>
-            <p class="text-muted text-sm" style="margin-top: 6px;">
-              Allocate 50% of your allowance to Needs (Food, Rent, Travel), 30% to Wants (Entertainment, Shopping), and 20% to emergency savings.
-            </p>
-          </div>
-          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <strong style="color: var(--primary);">2. Daily Spending Cap</strong>
-            <p class="text-muted text-sm" style="margin-top: 6px;">
-              Divide your remaining balance by the remaining days in the month to find your daily maximum spending limit.
-            </p>
-          </div>
-          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <strong style="color: var(--primary);">3. 24-Hour Purchase Rule</strong>
-            <p class="text-muted text-sm" style="margin-top: 6px;">
-              For any non-essential purchase over ₹500, wait 24 hours before buying to avoid impulse spending.
-            </p>
-          </div>
+        <div id="largestMonthExpenseContainer">
+          <!-- Populated dynamically by alerts.js -->
         </div>
       </div>
     </div>
@@ -152,7 +82,7 @@
   <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <p>Personal Expense Tracker &bull; College Project Demonstration</p>
+      <p>Personal Expense Tracker &bull; College Project</p>
     </div>
   </footer>
 

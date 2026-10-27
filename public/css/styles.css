@@ -703,89 +703,89 @@ body {
 
 .alert-status-card {
   border-radius: var(--radius-md);
-  padding: 28px;
-  box-shadow: var(--shadow-md);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .status-danger {
   background-color: #fff5f5;
-  border: 2px solid #ef4444;
-}
-
-.status-danger h3 {
-  color: #b91c1c;
-  font-size: 22px;
+  border: 1px solid #f87171;
 }
 
 .status-safe {
   background-color: #f0fdf4;
-  border: 2px solid #10b981;
+  border: 1px solid #86efac;
 }
 
-.status-safe h3 {
-  color: #047857;
-  font-size: 22px;
-}
-
-.alert-stats-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
+.alert-warning-callout {
   background: #ffffff;
-  padding: 16px 20px;
+  padding: 14px 18px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-}
-
-.stat-item-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.stat-item-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--dark);
-  margin-top: 2px;
-}
-
-.advice-section {
-  background: #ffffff;
-  border-radius: var(--radius-sm);
-  padding: 18px 22px;
-  border: 1px solid var(--border-color);
-}
-
-.advice-section h4 {
-  font-size: 15px;
-  color: var(--dark);
-  margin-bottom: 12px;
-}
-
-.advice-list {
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  border-left: 4px solid #ef4444;
+  margin-top: 6px;
   font-size: 14px;
+  color: #991b1b;
+  line-height: 1.5;
 }
 
-.insights-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+/* Largest Expense in This Month Hero Banner */
+.largest-expense-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.hero-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.hero-note {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.hero-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.hero-amount-block {
+  text-align: right;
+}
+
+.hero-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.hero-amount {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--expense);
 }
 
 .insights-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .insight-item {
